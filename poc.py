@@ -8,6 +8,7 @@ import sys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
 from selenium import webdriver
 import json
 
@@ -23,7 +24,7 @@ url = "https://www.starbucks.com/account/create"
 def create_account(birthday):
   
   # Create email address
-  emailAddress = "alexalex" + birthday + "@yahoo.com"
+  emailAddress = "alexalex" + birthday + "@aol.com"
   
   # Use Selenium/PhantomJS to retrieve the form
   print("Starting up PhantomJS")
@@ -59,15 +60,19 @@ def create_account(birthday):
     
   print("Setting the password value to " + PASSWORD)
   driver.find_element_by_xpath("//*[@id='password']").send_keys(PASSWORD)
-  driver.save_screenshot('out.png')
 
   print("Selecting the digital rewards card")
-  driver.find_element_by_xpath("//*[@id='cardRewards']/label[1]/input").click()
-    
+  driver.find_element_by_xpath("//*[@id='cardRewards']/label[1]").click()
+  
   print("Setting the birthday value to " + birthday)
-  driver.find_element_by_css_selector('#birthMonth .select__selected_text')[0]['value'] = 'May'
-  driver.find_element_by_css_selector('#birthDay .select__selected_text')[0]['value'] = '19'
+  month_select = Select(driver.find_element_by_xpath("//*[@id='birthMonth']"))
+  #print [o.text for o in month_select.options]
+  month_select.select_by_visible_text('May')
     
+  day_select = Select(driver.find_element_by_xpath("//*[@id='birthDay']"))
+  #print [o.text for o in day_select.options]
+  day_select.select_by_visible_text('26')
+      
   print("Selecting the Terms and Conditions")
   tocRadio = driver.find_element_by_id('termsAndConditions')
   tocRadio.click()
@@ -75,8 +80,8 @@ def create_account(birthday):
   # Submitting the form
   print("Submitting the form")
   try:
-    submitButton = driver.find_element_by_class_name('sb-button')
-    submitButton.click()
+    driver.save_screenshot('out.png')
+    tocRadio.submit()
   except Exception:
     print('Errored out somewhere:')
     print Exception
